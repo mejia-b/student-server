@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Student</title>
+    
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <!-- Include Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <!-- Include jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
+    <!-- Include custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* 100% of the viewport height */
+        }
+        
+        .container {
+            margin-top: 30px;
+        }
+
+        .student-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            background-color: #fff;
+        }
+
+        #response {
+            margin-top: 20px;
+        }
+
+        .footer {
+            margin-top: auto; /* Push the footer to the bottom */
+            text-align: center;
+            font-size: 14px;
+            background-color: #343a40; /* Footer background color */
+            color: white; /* Footer text color */
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Student Registry</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="addStudent.html">Add</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="updateStudent.html">Update</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="displayStudent.html">View</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="deleteStudent.html">Delete</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="listStudents.html">List</a>
+              </li>
+            </ul>
+            <form class="d-flex" role="search" id="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="lastname">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+              </form>
+          </div>
+        </div>
+      </nav>
+
+
+    <div class="container">
+        <h1 class="mt-5">Add a New Student</h1>
+        <form id="studentForm">
+            <div class="form-group">
+                <label for="first_name">First Name:</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">Last Name:</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="gpa">GPA:</label>
+                <input type="number" step="0.01" class="form-control" id="gpa" name="gpa" required>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="enrolled" name="enrolled">
+                <label class="form-check-label" for="enrolled">Enrolled</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Add Student</button>
+        </form>
+
+        <div id="response"></div>
+        <div id="student" class="mt-3"></div>
+    </div>
+
+
+    <!-- Footer -->
+    <div class="footer">
+        Created by ❤️ Brenda Mejia - Z23035067
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#studentForm').submit(function (e) {
+                e.preventDefault();
+
+                const firstName = $('#first_name').val();
+                const lastName = $('#last_name').val();
+                const gpa = parseFloat($('#gpa').val());
+                const enrolled = $('#enrolled').is(':checked');
+
+                const student = {
+                    first_name: firstName,
+                    last_name: lastName,
+                    gpa: gpa,
+                    enrolled: enrolled
+                };
+
+                axios.post('/students', student)
+                .then(response => {
+                    const responseDiv = $('#response');
+                    if (response.data.record_id === -1) {
+                        responseDiv.html('<div class="alert alert-danger">Error: Unable to create student resource</div>');
+                    } else {
+                        responseDiv.html('<div class="alert alert-success">Successfully created student with ID ' + response.data.record_id + '</div>');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Function to fetch and display a single student by last name
+            function getStudentByLastName() {
+                const lastname = $('#lastname').val();
+  
+                axios.get('/students/lastname/' + lastname)
+                .then(response => {
+                    const studentDiv = $('#student');
+                    if (response.data.message === 'Error. The requested resource was not found.') {
+                        studentDiv.html('<div class="alert alert-danger">Error: The requested student was not found.</div>');
+                    } else {
+                        const student = response.data[0]; // Assuming the response is an array with one student
+                        if (student) {
+                            // Format and display the student's information
+                            const studentCard = `
+                                <div class="student-card">
+                                    <h3>Student Information</h3>
+                                    <p><strong>Record ID:</strong> ${student.record_id}</p>
+                                    <p><strong>First Name:</strong> ${student.first_name}</p>
+                                    <p><strong>Last Name:</strong> ${student.last_name}</p>
+                                    <p><strong>GPA:</strong> ${student.gpa}</p>
+                                    <p><strong>Enrolled:</strong> ${student.enrolled ? 'Yes' : 'No'}</p>
+                                </div>
+                            `;
+                            studentDiv.html(studentCard);
+                        } else {
+                            studentDiv.html('<div class="alert alert-danger">Error: The requested student was not found.</div>');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+  
+            // Submit the form to fetch and display the student
+            $('#search').submit(function (e) {
+                e.preventDefault();
+                getStudentByLastName();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Student by Last Name</title>
+    
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <!-- Include Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Include Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- Include custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            margin-top: 30px;
+        }
+
+        .student-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            background-color: #fff;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">View Student by Last Name</h1>
+        <form id="studentForm">
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                <input type="text" class="form-control" id="lastname" name="lastname" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">View Student</button>
+        </form>
+
+        <div id="student" class="mt-3"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Created by ❤️ Brenda Mejia - Z23035067
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Function to fetch and display a single student by last name
+            function getStudentByLastName() {
+                const lastname = $('#lastname').val();
+
+                axios.get('/students/lastname/' + lastname)
+                .then(response => {
+                    const studentDiv = $('#student');
+                    if (response.data.message === 'Error. The requested resource was not found.') {
+                        studentDiv.html('<div class="alert alert-danger">Error: The requested student was not found.</div>');
+                    } else {
+                        const student = response.data[0]; // Assuming the response is an array with one student
+                        if (student) {
+                            // Format and display the student's information
+                            const studentCard = `
+                                <div class="student-card">
+                                    <h3>Student Information</h3>
+                                    <p><strong>Record ID:</strong> ${student.record_id}</p>
+                                    <p><strong>First Name:</strong> ${student.first_name}</p>
+                                    <p><strong>Last Name:</strong> ${student.last_name}</p>
+                                    <p><strong>GPA:</strong> ${student.gpa}</p>
+                                    <p><strong>Enrolled:</strong> ${student.enrolled ? 'Yes' : 'No'}</p>
+                                </div>
+                            `;
+                            studentDiv.html(studentCard);
+                        } else {
+                            studentDiv.html('<div class="alert alert-danger">Error: The requested student was not found.</div>');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+
+            // Submit the form to fetch and display the student
+            $('#studentForm').submit(function (e) {
+                e.preventDefault();
+                getStudentByLastName();
+            });
+        });
+    </script>
+</body>
+</html>

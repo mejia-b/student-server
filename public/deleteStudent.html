@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Student</title>
+    
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <!-- Include Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
+    <!-- Include custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* 100% of the viewport height */
+        }
+        
+        .container {
+            margin-top: 30px;
+        }
+
+        #response {
+            margin-top: 20px;
+        }
+
+        .footer {
+            margin-top: auto; /* Push the footer to the bottom */
+            text-align: center;
+            font-size: 14px;
+            background-color: #343a40; /* Footer background color */
+            color: white; /* Footer text color */
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Student Registry</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="addStudent.html">Add</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="updateStudent.html">Update</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="displayStudent.html">View</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="deleteStudent.html">Delete</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="listStudents.html">List</a>
+              </li>
+            </ul>
+            <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+          </div>
+        </div>
+      </nav>
+
+
+    <div class="container">
+        <h1 class="mt-5">Delete Student</h1>
+        <form id="studentForm">
+            <div class="form-group">
+                <label for="record_id">Record ID:</label>
+                <input type="text" class="form-control" id="record_id" name="record_id" required>
+            </div>
+
+            <button type="submit" class="btn btn-danger mt-3">Delete Student</button>
+        </form>
+
+        <div id="response"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Created by ❤️ Brenda Mejia - Z23035067
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#studentForm').submit(function (e) {
+                e.preventDefault();
+
+                const recordId = $('#record_id').val();
+
+                axios.delete('/students/' + recordId)
+                .then(response => {
+                    const responseDiv = $('#response');
+                    if (response.data.message === 'record deleted') {
+                        responseDiv.html('<div class="alert alert-success">Successfully deleted student with ID ' + recordId + '</div>');
+                    } else if (response.data.message === 'error - resource not found') {
+                        responseDiv.html('<div class="alert alert-danger">Error: Resource not found for ID ' + recordId + '</div>');
+                    } else {
+                        responseDiv.html('<div class="alert alert-danger">Error: Unable to delete student with ID ' + recordId + '</div>');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
